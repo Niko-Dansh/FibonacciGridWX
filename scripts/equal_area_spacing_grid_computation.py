@@ -6,7 +6,8 @@ n = 600  # free API allows only 600 unique places
 
 def fibonacci_grid(n, save_csv=False, csv_filename="grid_points.csv"):
     """
-    Computes Longitudes and Latitudes for points with almost equal spacing on globe sphere.
+    Computes Longitudes and Latitudes for points
+    with almost equal spacing on globe sphere.
     :param n: number of points in grid system
     :return: list of dicts with keys 'id', 'lat', 'lon', CSV if save_csv=True
     """
@@ -22,10 +23,10 @@ def fibonacci_grid(n, save_csv=False, csv_filename="grid_points.csv"):
         # convert to degrees
         lat_deg = math.degrees(lat_k)
         lon_deg = math.degrees(lon_k) - 180
-        points.append({"id": k, "lat": lat_deg, "lon": lon_deg})
+        points.append({"lat": lat_deg, "lon": lon_deg})  # dont need id here
     if save_csv:
         with open(csv_filename, "w", newline="") as file:
-            writer = csv.DictWriter(file, fieldnames=["id", "lat", "lon"])
+            writer = csv.DictWriter(file, fieldnames=["lat", "lon"])
             writer.writeheader()
             writer.writerows(points)
 
