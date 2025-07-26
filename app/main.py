@@ -4,7 +4,7 @@ load_dotenv()  # Загружает переменные из .env
 from fetch_test import fetch_grid_points, send_payload_to_db
 from get_weather_test import get_point_weather
 import time
-
+from datetime import datetime, timezone
 
 # Установите рабочую директорию в директорию скрипта
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
@@ -24,7 +24,7 @@ for unique_row in fetch_600:
     point_id = unique_row['point_id']
     lat = unique_row['lat']
     lon = unique_row['lon']
+    fetched_at = datetime.now(timezone.utc)
     get_test_response = get_point_weather(lat, lon, api_key)
-    print(get_test_response)
-    #send_payload_to_db(point_id=point_id, get_test_response=get_test_response, conn_params=conn_params)
+    send_payload_to_db(point_id=point_id, fetched_at=fetched_at, get_test_response=get_test_response, conn_params=conn_params)
     time.sleep(1)

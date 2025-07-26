@@ -1,6 +1,5 @@
 import psycopg2
 from psycopg2.extras import RealDictCursor
-from datetime import datetime, timezone
 import json
 
 
@@ -24,8 +23,7 @@ def fetch_grid_points(conn_params, limit=None):
     return rows
 
 
-def send_payload_to_db(point_id, get_test_response, conn_params):
-    fetched_at = datetime.now(timezone.utc)
+def send_payload_to_db(point_id, fetched_at, get_test_response, conn_params):
 
     insert_sql = '''
     INSERT INTO weather_raw (point_id, fetched_at, payload)
