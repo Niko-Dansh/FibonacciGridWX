@@ -1,0 +1,133 @@
+
+=== File: C:\Users\naunn\PycharmProjects\FibonacciGridWX\app\fetch_test.py ===
+import os
+
+import psycopg2
+from numpy.ma.core import append
+from psycopg2.extras import RealDictCursor
+from requests.utils import get_unicode_from_response
+from datetime import datetime, timezone
+import json
+import os
+
+
+
+def fetch_grid_points(conn_params, limit=None):
+
+
+    #Коннектимся к постгрессу
+    conn = psycopg2.connect(**conn_params) # ** - распаковка словарика {'port': 5432} -> port=5432
+    cur = conn.cursor(cursor_factory=RealDictCursor) # Use RealDictCursor to get rows as dicts
+
+    #Делаем коннект с помощью SQL
+    sql = 'SELECT point_id, lat, lon FROM grid_points'
+    if limit:
+        sql += f' LIMIT {limit}'
+
+    cur.execute(sql)
+    rows = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+
+    return rows
+
+
+
+
+
+
+def send_payload_to_db(point_id, get_test_response, conn_params):
+    fetched_at = datetime.now(timezone.utc)
+
+    insert_sql = '''
+    INSERT INTO weather_raw (point_id, fetched_at, payload)
+    VALUES (%s, %s, %s)
+    '''
+
+
+
+    conection_to_send = psycopg2.connect(**conn_params)
+    cur_2_send_to_table = conection_to_send.cursor(cursor_factory=RealDictCursor)
+
+
+    print(point_id, fetched_at, get_test_response)
+    print(type(point_id), type(fetched_at), type(get_test_response))
+    real_JSON_get_test_response = json.dumps(get_test_response)
+    cur_2_send_to_table.execute(insert_sql, (point_id, fetched_at, real_JSON_get_test_response))
+
+    conection_to_send.commit()
+
+    conection_to_send.close()
+    cur_2_send_to_table.close()
+
+
+=== File: C:\Users\naunn\PycharmProjects\FibonacciGridWX\app\get_weather_test.py ===
+import requests  # библиотека для работы с запросами для API
+import os  # Библиотека для работы с Операционной Системой
+import time
+
+#api_key = os.getenv('OWM_API_KEY')  # Получаем спрятанный ключ API
+
+base_url = "https://api.weatherapi.com/v1/current.json"
+#https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={API key}
+
+
+
+
+def get_point_weather(lat: float, lon: float, api_key: str):
+    response = requests.get(f'https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={api_key}')
+    resp = response.json()
+    return resp
+
+#fetch_1 = fetch_grid_points(limit=2) # Получаем RealDictRow  behaves like a Python dictionary but is not exactly a plain dict
+
+# # row_1 = fetch_1[0]
+# print(row_1['point_id'],row_1['lat'], row_1['lon'])
+#
+# point_id = row_1['point_id']
+# lat = row_1['lat']
+# lon = row_1['lon']
+#
+# get_test_response = get_point_weather(lat, lon) # Получаем ответик от апи с погодой по данным из таблицы grid_points
+#
+# print(get_test_response)
+=== File: C:\Users\naunn\PycharmProjects\FibonacciGridWX\app\main.py ===
+import os # Библиотека для работы с операционной системйо
+from dotenv import load_dotenv  # Библиотека для работы с файлом .env
+load_dotenv()  # Загружает переменные из .env
+from fetch_test import fetch_grid_points, send_payload_to_db
+from get_weather_test import get_point_weather
+import time
+
+
+# Установите рабочую директорию в директорию скрипта
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
+conn_params = {
+    'host': os.getenv('DB_HOST'),
+    'port': int(os.getenv('DB_PORT')),
+    'dbname': os.getenv('DB_NAME'),
+    'user': os.getenv('DB_USER'),
+    'password': os.getenv('DB_PASSWORD'),
+}
+api_key = os.getenv('OWM_API_KEY')
+print(conn_params)
+print(api_key)
+
+print('1-1-' * 50)
+
+fetch_600 = fetch_grid_points(conn_params=conn_params, limit=1000)
+
+print(fetch_600)
+print('2-2-' * 50)
+
+for unique_row in fetch_600:
+    point_id = unique_row['point_id']
+    lat = unique_row['lat']
+    lon = unique_row['lon']
+    get_test_response = get_point_weather(lat, lon, api_key)
+    print(get_test_response)
+    send_payload_to_db(point_id=point_id, get_test_response=get_test_response)
+    time.sleep(1)
+=== File: C:\Users\naunn\PycharmProjects\FibonacciGridWX\app\__init__.py ===
