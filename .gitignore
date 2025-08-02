@@ -3,4 +3,5 @@
 __pycache__/
 *.pyc
 .idea/
-
+./scripts/all_code.txt
+./scripts/Bundle_code.py

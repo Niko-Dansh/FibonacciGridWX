@@ -1,4 +1,4 @@
-import requests  # библиотека для работы с запросами для API
+import requests
 
 base_url = "https://api.weatherapi.com/v1/current.json"
 
