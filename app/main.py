@@ -1,12 +1,13 @@
 import os # Библиотека для работы с операционной системйо
 from dotenv import load_dotenv  # Библиотека для работы с файлом .env
 
-from fetch_test import fetch_grid_points, send_payload_to_db
-from get_weather_test import get_point_weather
+from fetcher import fetch_grid_points, send_payload_to_db
+from weather import get_point_weather
 import time
 from datetime import datetime, timezone
 
 def main():
+
     load_dotenv()  # Load environment variables from .env
 
     # Set working directory to the script directory

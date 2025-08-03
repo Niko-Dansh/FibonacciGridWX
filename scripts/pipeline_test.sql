@@ -280,3 +280,14 @@ ORDER BY weather_date, point_id;
 
 ALTER TABLE wx_analytics_daily_v5
     RENAME TO weather_analytics_daily;
+
+SELECT MODE() WITHIN GROUP (  weather_desc ) AS weather_desc_test
+FROM weather_analytics_daily
+
+LIMIT 10;
+
+SELECT
+    MODE() WITHIN GROUP (ORDER BY weather_desc) AS most_common_weather_desc
+FROM weather_analytics_daily
+WHERE weather_date <= '2025-07-27'
+;
