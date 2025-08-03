@@ -4,7 +4,7 @@ EXTENSIONS = {'.py', '.csv', '.yaml', '.env', '.txt'}  # расширения, �
 OUTFILE = 'all_code.txt'
 
 with open(OUTFILE, 'w', encoding='utf-8') as outf:
-    for root, dirs, files in os.walk(r'C:\Users\naunn\PycharmProjects\FibonacciGridWX\app'):
+    for root, dirs, files in os.walk(r'C:\Users\naunn\PycharmProjects\FibonacciGridWX'):
         # пропустим папку venv или .git
         if any(part in ('venv', '.git') for part in root.split(os.sep)):
             continue
